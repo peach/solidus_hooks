@@ -1,0 +1,14 @@
+*.swp
+.DS_Store
+.rvmrc
+Gemfile.lock
+pkg
+spec/dummy
+*~
+tmp
+.localeapp
+coverage
+.ruby-version
+.ruby-gemset
+.idea
+gemfiles/*.gemfile.lock
