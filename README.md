@@ -1,4 +1,19 @@
+
 Spree Hooks
+
+## Installation
+
+Add to `Gemfile`:
+```ruby
+gem 'spree_hooks', github: 'spree-contrib/spree_hooks'
+```
+
+Run:
+```sh
+$ bundle && bundle exec rails g spree_hooks:install
+```
+
+-----------------
 
 Following are two engines, one to handle events, under the Observer
 module and another to perform notifications, under the Hooks module.
