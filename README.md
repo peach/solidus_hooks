@@ -5,7 +5,7 @@ Spree Hooks
 
 Add to `Gemfile`:
 ```ruby
-gem 'spree_hooks', github: 'spree-contrib/spree_hooks'
+gem 'spree_hooks', github: 'cenit-io/spree_hooks'
 ```
 
 Run:
