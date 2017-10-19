@@ -1,8 +1,8 @@
-module SpreeHooks
+module SolidusHooks
   class Engine < Rails::Engine
     require 'spree/core'
     isolate_namespace Spree
-    engine_name 'spree_hooks'
+    engine_name 'solidus_hooks'
 
     config.autoload_paths += %W(#{config.root}/lib)
 

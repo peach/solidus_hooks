@@ -1,8 +1,21 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
-spree_version = 'master'
-gem 'spree', github: 'spree/spree', branch: spree_version
-gem 'rails-controller-testing'
+branch = ENV.fetch('SOLIDUS_BRANCH', 'master')
+gem "solidus", github: "solidusio/solidus", branch: branch
+
+if branch == 'master' || branch >= "v2.0"
+  gem "rails-controller-testing", group: :test
+else
+  gem "rails_test_params_backport", group: :test
+  gem "rails", "~> 4.2.7"
+end
+
+gem 'pg'
+gem 'mysql2'
 gem 'httparty'
+
+group :development, :test do
+  gem "pry-rails"
+end
 
 gemspec

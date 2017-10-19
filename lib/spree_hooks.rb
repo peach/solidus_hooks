@@ -1,7 +1,0 @@
-require 'spree_backend'
-require 'spree_core'
-require 'spree_hooks/engine'
-require 'spree_hooks/version'
-require 'coffee_script'
-require 'sass/rails'
-require 'spree_extension'

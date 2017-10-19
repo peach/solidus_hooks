@@ -1,16 +1,15 @@
-
-Spree Hooks
+SolidusHooks
 
 ## Installation
 
 Add to `Gemfile`:
 ```ruby
-gem 'spree_hooks', github: 'cenit-io/spree_hooks'
+gem 'solidus_hooks', github: 'cenit-io/solidus_hooks'
 ```
 
 Run:
 ```sh
-$ bundle && bundle exec rails g spree_hooks:install
+$ bundle && bundle exec rails g solidus_hooks:install
 ```
 
 -----------------
@@ -38,9 +37,9 @@ which should not be confused with the name of any attribute, since it does not
 would be a valid name, and in addition, could be easily converted to a selector
 to perform a query the database.
 
-Spree's more complex models, say Order and Product, delegate
+Solidus's more complex models, say Order and Product, delegate
 several attributes to in other models. For example the price of a
-product is stored in the Spree called the "master" variant which is
+product is stored in the Solidus called the "master" variant which is
 a reference to a Variant type record and this in turn stores the
 price in a reference "default_price" to a record of type Price that
 finally has an attribute "amount" with the price.
@@ -73,12 +72,12 @@ sending a JSON content with the following structure:
 ```
 
 with this information the listener who has registered the hook can
-request by the Spree API the information about the record
+request by the Solidus API the information about the record
 involved in the event.
 
 Finally, these two Event models as WebHook, have been integrated
-to the Spree API, so that they can be configured remotely. The
-access routes for the REST API of Spree are, for example in the
+to the Solidus API, so that they can be configured remotely. The
+access routes for the REST API of Solidus are, for example in the
 store1 case
 
     http://localhost:3000/api/v1/events
