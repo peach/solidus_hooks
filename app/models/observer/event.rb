@@ -1,5 +1,6 @@
 module Observer
   class Event < ApplicationRecord
+    serialize :triggers
 
     has_many :event_dependencies, class_name: Observer::EventDependency.to_s, inverse_of: :event
 
