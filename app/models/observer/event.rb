@@ -269,7 +269,7 @@ module Observer
       end
     end
 
-    class HashType < ActiveModel::Type::Text
+    class HashType < ActiveRecord::Type::Text
 
       def cast_value(value)
         if value.is_a?(Hash)
