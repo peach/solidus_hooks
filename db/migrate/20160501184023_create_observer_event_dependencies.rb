@@ -1,4 +1,4 @@
-class CreateObserverEventDependencies < ActiveRecord::Migration[5.0]
+class CreateObserverEventDependencies < ActiveRecord::Migration
   def change
     create_table :observer_event_dependencies do |t|
       t.references  :event

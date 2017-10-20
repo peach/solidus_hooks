@@ -1,4 +1,4 @@
-class CreateHooksWebHooks < ActiveRecord::Migration[5.0]
+class CreateHooksWebHooks < ActiveRecord::Migration
   def change
     create_table :hooks_web_hooks do |t|
       t.string :name

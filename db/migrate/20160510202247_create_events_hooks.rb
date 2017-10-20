@@ -1,4 +1,4 @@
-class CreateEventsHooks < ActiveRecord::Migration[5.0]
+class CreateEventsHooks < ActiveRecord::Migration
   def change
     create_join_table :events, :hooks
   end

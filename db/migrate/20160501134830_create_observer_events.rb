@@ -1,4 +1,4 @@
-class CreateObserverEvents < ActiveRecord::Migration[5.0]
+class CreateObserverEvents < ActiveRecord::Migration
   def change
     create_table :observer_events do |t|
       t.string  :name
