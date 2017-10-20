@@ -80,28 +80,40 @@ module Observer
     #
     # applies when the <tt>checked</tt> attribute becomes true, while
     #
-    #    { "price": { "$get": 100 } }
+    #    { "price": { "$get": 100, "$lt": 250 } }
     #
     # applies when the <tt>price</tt> becomes greater or equals than 100.
     #
     def apply?(cond, old_value, new_value)
       if cond.is_a?(Hash)
-        cond.each do |op, constraint|
-          if (match = op.match(/\A\$(.+)/))
-            begin
-              return false unless send("apply_#{match[1]}_operator?", old_value, new_value, constraint)
-            rescue Exception => ex
-              fail "Error executing operator #{op}: #{ex.message}"
-            end
-          else
-            fail "Invalid operator #{op}"
-          end
-        end
-        true
+        return false if apply_hash?(cond, old_value, new_value)
+        return false unless apply_hash?(cond, new_value, old_value)
       else
         old_value != cond && cond == new_value
       end
+      true
     end
+
+    def apply_hash?(cond, value, other)
+      cond.each do |op, constraint|
+        if (match = op.to_s.match(/\A\$(.+)/))
+          begin
+            operator = "apply_#{match[1]}_operator?"
+            if operator == 'apply_changes_operator?'
+              return false unless apply_changes_operator?(value, other, constraint)
+            else
+              return false unless send(operator, value, constraint)
+            end
+          rescue Exception => ex
+            fail "Error executing operator #{op}: #{ex.message}"
+          end
+        else
+          fail "Invalid operator #{op}"
+        end
+      end
+      true
+    end
+
 
     # Evaluator for <tt>$present</tt> operator.
     #
@@ -109,11 +121,11 @@ module Observer
     #
     #   { "created_at": { "$present": true }  }
     #
-    def apply_present_operator?(old_value, new_value, constraint)
+    def apply_present_operator?(value, constraint)
       if constraint
-        new_value.present? && old_value.blank?
+        value.present?
       else
-        new_value.blank? && old_value.present?
+        value.blank?
       end
     end
 
@@ -124,8 +136,8 @@ module Observer
     #
     #   { "updated_at": { "$changes": true }  }
     #
-    def apply_changes_operator?(old_value, new_value, constraint)
-      constraint && (new_value != old_value)
+    def apply_changes_operator?(value, other, constraint)
+      constraint && (value != other)
     end
 
     # Evaluator for <tt>$ne</tt> operator.
@@ -136,8 +148,8 @@ module Observer
     #
     # applies when a "yellow" <tt>color</tt> attribute takes another value.
     #
-    def apply_ne_operator?(old_value, new_value, constraint)
-      old_value.eql?(constraint) && !new_value.eql?(constraint)
+    def apply_ne_operator?(value, constraint)
+      !value.eql?(constraint)
     end
 
 
@@ -149,8 +161,8 @@ module Observer
     #
     # applies when the <tt>price</tt> becomes greater than 100.
     #
-    def apply_gt_operator?(old_value, new_value, constraint)
-      old_value <= constraint && new_value > constraint
+    def apply_gt_operator?(value, constraint)
+      value > constraint
     end
 
     # Evaluator for <tt>$gte</tt> operator.
@@ -161,8 +173,8 @@ module Observer
     #
     # applies when the <tt>price</tt> becomes greater than or equals to 100.
     #
-    def apply_gte_operator?(old_value, new_value, constraint)
-      old_value < constraint && new_value >= constraint
+    def apply_gte_operator?(value, constraint)
+      value >= constraint
     end
 
     # Evaluator for <tt>$lt</tt> operator.
@@ -173,8 +185,8 @@ module Observer
     #
     # applies when the <tt>price</tt> becomes less than 100.
     #
-    def apply_lt_operator?(old_value, new_value, constraint)
-      old_value >= constraint && new_value < constraint
+    def apply_lt_operator?(value, constraint)
+      value < constraint
     end
 
     # Evaluator for <tt>$lte</tt> operator.
@@ -185,8 +197,8 @@ module Observer
     #
     # applies when the <tt>price</tt> becomes less than or equals to 100.
     #
-    def apply_lte_operator?(old_value, new_value, constraint)
-      old_value > constraint && new_value <= constraint
+    def apply_lte_operator?(value, constraint)
+      value <= constraint
     end
 
     # Evaluator for <tt>$in</tt> operator.
@@ -197,8 +209,8 @@ module Observer
     #
     # applies when a non RGB <tt>color</tt> takes one of the RGB values.
     #
-    def apply_in_operator?(old_value, new_value, constraint)
-      constraint.exclude?(old_value) && constraint.include?(new_value)
+    def apply_in_operator?(value, constraint)
+      constraint.include?(value)
     end
 
     # Evaluator for <tt>$nin</tt> operator.
@@ -209,8 +221,8 @@ module Observer
     #
     # applies when an RGB <tt>color</tt> becomes a non RGB value.
     #
-    def apply_nin_operator?(old_value, new_value, constraint)
-      constraint.include?(old_value) && constraint.exclude?(new_value)
+    def apply_nin_operator?(value, constraint)
+      constraint.exclude?(value)
     end
 
     def lookup_on(record, changes = nil)
