@@ -23,7 +23,7 @@ module Observer
   end
 
   def store_timestamps
-    all_timestamp_attributes_in_model.each { |attr| timestamps_before[attr] = send(attr) }
+    all_timestamp_attributes_in_model.each { |attr| timestamps_before[attr] = send(attr) if has_attribute?(attr) }
   end
 
   def store_changes
