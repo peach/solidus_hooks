@@ -1,8 +1,8 @@
-require 'observer'
-require 'hooks'
+require 'solidus_hooks/observer'
+require 'solidus_hooks/hooks'
 
 module Spree
   Base.class_eval do
-    include Observer
+    include SolidusHooks::Observer
   end
 end
