@@ -2,7 +2,7 @@ module SolidusHooks
   module Observer
     class EventDependency < ApplicationRecord
 
-      belongs_to :event, class_name: SolidusHooks::Observer::Event.to_s, inverse_of: :event_dependencies
+      belongs_to :event, class_name: SolidusHooks::Observer::Event.to_s, inverse_of: :event_dependencies, dependent: :destroy
 
       belongs_to :dependent_event, class_name: SolidusHooks::Observer::Event.to_s, inverse_of: nil
 

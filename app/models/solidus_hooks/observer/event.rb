@@ -2,12 +2,20 @@ module SolidusHooks
   module Observer
     class Event < ApplicationRecord
       serialize :triggers
-
+      before_destroy :destroy_event_dependencies
       has_many :event_dependencies, class_name: SolidusHooks::Observer::EventDependency.to_s, inverse_of: :event
 
       before_save :check_triggers
 
       after_save :store_sub_events
+
+      def dependent_events
+        SolidusHooks::Observer::EventDependency.where(dependent_event_id: self.id)
+      end
+
+      def destroy_event_dependencies
+        dependent_events.destroy_all
+      end
 
       def check_triggers
         @sub_events = {}
