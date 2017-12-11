@@ -158,7 +158,20 @@ module SolidusHooks
       # applies when a "yellow" <tt>color</tt> attribute takes another value.
       #
       def apply_ne_operator?(value, constraint)
-        !value.eql?(constraint)
+        value != constraint
+      end
+
+
+      # Evaluator for <tt>$eq</tt> operator.
+      #
+      # For example:
+      #
+      #    { "color": { "$eq": "yellow"" } }
+      #
+      # applies when <tt>color</tt> attribute take "yellow" value.
+      #
+      def apply_eq_operator?(value, constraint)
+        value == constraint
       end
 
 
