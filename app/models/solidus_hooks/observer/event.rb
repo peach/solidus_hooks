@@ -110,6 +110,9 @@ module SolidusHooks
               operator = "apply_#{match[1]}_operator?"
               if operator == 'apply_changes_operator?'
                 return false unless apply_changes_operator?(value, other, constraint)
+              elsif match[1] =~ /^was_/
+                operator = "apply_#{match[1].split('was_')[1]}_operator?"
+                return false unless send(operator, other, constraint)
               else
                 return false unless send(operator, value, constraint)
               end
