@@ -89,7 +89,7 @@ module SolidusHooks
       #
       # applies when the <tt>checked</tt> attribute becomes true, while
       #
-      #    { "price": { "$get": 100, "$lt": 250 } }
+      #    { "price": { "$gte": 100, "$lt": 250 } }
       #
       # applies when the <tt>price</tt> becomes greater or equals than 100.
       #
@@ -105,17 +105,15 @@ module SolidusHooks
 
       def apply_hash?(cond, value, other)
         cond.each do |op, constraint|
-          if (match = op.to_s.match(/\A\$(.+)/))
+          if (opt = op.to_s[/\A\$(.+)/,1])
             begin
-              operator = match[1]
-              op_method = "apply_#{operator}_operator?"
-              if op_method == 'apply_changes_operator?'
-                return false unless apply_changes_operator?(value, other, constraint)
-              elsif (ignore_was = operator[/^was_(.*)/,1])
-                op_method = "apply_#{ignore_was}_operator?"
-                return false unless send(op_method, other, constraint)
+              case opt
+              when 'changes'
+                return false if !apply_changes_operator?(value, other, constraint)
+              when /^was_(.*)/
+                return false if !send("apply_#{$1}_operator?", other, constraint)
               else
-                return false unless send(op_method, value, constraint)
+                return false if !send("apply_#{opt}_operator?", value, constraint)
               end
             rescue Exception => ex
               fail "Error executing operator #{op}: #{ex.message}"
