@@ -1,11 +1,7 @@
 module SolidusHooks
   module Hooks
     class NotificationHook < ApplicationRecord
-      has_and_belongs_to_many :events,
-                              join_table: 'events_hooks',
-                              foreign_key: 'event_id',
-                              association_foreign_key: 'hook_id',
-                              class_name: SolidusHooks::Observer::Event.to_s
+      has_many :events, as: :eventable, dependent: :destroy
 
       accepts_nested_attributes_for :events, allow_destroy: true
       has_many :notification_logs, class_name: SolidusHooks::NotificationLog.name

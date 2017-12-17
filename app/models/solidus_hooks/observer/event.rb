@@ -1,6 +1,8 @@
 module SolidusHooks
   module Observer
     class Event < ApplicationRecord
+      belongs_to :eventable, polymorphic: true
+
       serialize :triggers
       before_destroy :destroy_event_dependencies
       has_many :event_dependencies, class_name: SolidusHooks::Observer::EventDependency.to_s, inverse_of: :event
@@ -11,6 +13,10 @@ module SolidusHooks
 
       def dependent_events
         SolidusHooks::Observer::EventDependency.where(dependent_event_id: self.id)
+      end
+
+      def hooks
+        SolidusHooks::Observer::Event.where(eventable_id: eventable_id).map(&:eventable).compact
       end
 
       def destroy_event_dependencies
