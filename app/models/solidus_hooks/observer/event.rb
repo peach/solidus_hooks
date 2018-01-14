@@ -15,8 +15,8 @@ module SolidusHooks
         SolidusHooks::Observer::EventDependency.where(dependent_event_id: self.id)
       end
 
-      def hooks
-        SolidusHooks::Observer::Event.where(eventable_id: eventable_id).map(&:eventable).compact
+      def hook
+        eventable
       end
 
       def destroy_event_dependencies

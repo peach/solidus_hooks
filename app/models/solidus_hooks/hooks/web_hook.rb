@@ -5,7 +5,8 @@ module SolidusHooks
 
       accepts_nested_attributes_for :events, allow_destroy: true
 
-      def notify(record, event_id = self.event_id)
+      def notify(record, event_id = nil)
+        event_id ||= events.first.try(:id)
         response = HTTParty.post url, body: {
           hook_id: id,
           event_id: event_id,

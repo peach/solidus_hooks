@@ -9,7 +9,5 @@ module SolidusHooks
 end
 
 SolidusHooks::Observer::Event.when_triggered do |record, event|
-  event.hooks.each do |hook|
-    hook.notify(record, event.id)
-  end
+  event.eventable.notify(record, event.id) if event.eventable.present?
 end
