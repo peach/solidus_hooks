@@ -7,20 +7,18 @@ module SolidusHooks
       has_many :event_dependencies, class_name: SolidusHooks::Observer::EventDependency.to_s, inverse_of: :event
       has_many :dependent_events, class_name: SolidusHooks::Observer::EventDependency.to_s, foreign_key: :dependent_event_id, dependent: :destroy
 
-      before_save :check_triggers
-
-      after_save :store_sub_events
+      before_validation :check_triggers
 
       def hook
         eventable
       end
 
       def check_triggers
-        @sub_events = {}
         checked = {}
         if triggers.blank?
           errors.add(:triggers, "can't be blank")
         else
+          self.dependent_events = []
           triggers.each do |field, cond|
             if target_model.attribute_names.include?(field.to_s)
               checked[field] = cond
@@ -28,8 +26,7 @@ module SolidusHooks
               if (r = target_model.reflect_on_association(field))
                 if cond.is_a?(Hash)
                   if (sub_event = self.class.new(triggers: cond.deep_dup, target_name: r.klass)).valid?
-                    dependency = self.dependent_events.new(association_name: field)
-                    @sub_events[sub_event] = dependency
+                    dependency = self.dependent_events.new(association_name: field, event: sub_event)
                   else
                     errors.add(:triggers, "association #{field} is not valid: #{sub_event.errors.full_messages.to_sentence}")
                   end
@@ -47,12 +44,6 @@ module SolidusHooks
           true
         else
           false
-        end
-      end
-
-      def store_sub_events
-        (@sub_events || {}).each do |sub_event, dependency|
-          sub_event.save && (sub_event.event_dependencies << dependency)
         end
       end
 
