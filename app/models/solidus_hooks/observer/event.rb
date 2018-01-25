@@ -4,23 +4,15 @@ module SolidusHooks
       belongs_to :eventable, polymorphic: true
 
       serialize :triggers
-      before_destroy :destroy_event_dependencies
       has_many :event_dependencies, class_name: SolidusHooks::Observer::EventDependency.to_s, inverse_of: :event
+      has_many :dependent_events, class_name: SolidusHooks::Observer::EventDependency.to_s, foreign_key: :dependent_event_id, dependent: :destroy
 
       before_save :check_triggers
 
       after_save :store_sub_events
 
-      def dependent_events
-        SolidusHooks::Observer::EventDependency.where(dependent_event_id: self.id)
-      end
-
       def hook
         eventable
-      end
-
-      def destroy_event_dependencies
-        dependent_events.destroy_all
       end
 
       def check_triggers
@@ -36,8 +28,7 @@ module SolidusHooks
               if (r = target_model.reflect_on_association(field))
                 if cond.is_a?(Hash)
                   if (sub_event = self.class.new(triggers: cond.deep_dup, target_name: r.klass)).valid?
-                    dependency = SolidusHooks::Observer::EventDependency.new(association_name: field)
-                    dependency.dependent_event = self
+                    dependency = self.dependent_events.new(association_name: field)
                     @sub_events[sub_event] = dependency
                   else
                     errors.add(:triggers, "association #{field} is not valid: #{sub_event.errors.full_messages.to_sentence}")
