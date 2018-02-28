@@ -83,21 +83,21 @@ module SolidusHooks
       #
       def apply?(cond, old_value, new_value)
         if cond.is_a?(Hash)
-          return false if apply_hash?(cond, old_value, new_value)
+          return false if apply_hash?(cond, old_value, new_value, true)
           return false unless apply_hash?(cond, new_value, old_value)
         else
-          old_value != cond && cond == new_value
+          return old_value != cond && cond == new_value
         end
         true
       end
 
-      def apply_hash?(cond, value, other)
+      def apply_hash?(cond, value, other, reverse=false)
         cond.each do |op, constraint|
           if (opt = op.to_s[/\A\$(.+)/,1])
             begin
               case opt
               when 'changes'
-                return false if !apply_changes_operator?(value, other, constraint)
+                return false if reverse || !apply_changes_operator?(value, other, constraint)
               when /^was_(.*)/
                 return false if !send("apply_#{$1}_operator?", other, constraint)
               else
@@ -245,7 +245,7 @@ module SolidusHooks
       end
 
       def trigger_on(record)
-        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")
+        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")        
         self.class.trigger(self, record)
         event_dependencies.each { |dependency| dependency.trigger_on(record) }
       end
