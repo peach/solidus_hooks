@@ -299,6 +299,9 @@ module SolidusHooks
         def cast_value(value)
           if value.is_a?(Hash)
             value
+          elsif value.is_a?(String)
+            value = value.strip.gsub(/.*{/, '{')
+            JSON.parse(value).to_hash
           else
             JSON.parse(value).to_hash
           end.with_indifferent_access
