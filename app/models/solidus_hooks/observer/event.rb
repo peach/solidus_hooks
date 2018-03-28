@@ -65,8 +65,7 @@ module SolidusHooks
             end
           end
         end
-        result = and_result || (or_triggers && or_triggers.any? { |t| applies_to?(changes, t) })
-        result
+        and_result || (or_triggers && or_triggers.any? { |t| applies_to?(changes, t) })
       end
 
       # Determines if a condition applies to a given pair of old-new values. If the condition
