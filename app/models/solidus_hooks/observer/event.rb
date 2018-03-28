@@ -245,7 +245,7 @@ module SolidusHooks
       end
 
       def trigger_on(record)
-        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")        
+        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")
         self.class.trigger(self, record)
         event_dependencies.each { |dependency| dependency.trigger_on(record) }
       end
@@ -300,7 +300,7 @@ module SolidusHooks
           if value.is_a?(Hash)
             value
           else
-            JSON.parse(value).to_hash
+            YAML.load(value).to_json rescue JSON.parse(value)
           end.with_indifferent_access
         end
 
