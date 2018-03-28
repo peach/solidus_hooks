@@ -65,7 +65,12 @@ module SolidusHooks
             end
           end
         end
-        and_result || (or_triggers && or_triggers.any? { |t| applies_to?(changes, t) })
+begin
+        result = and_result || (or_triggers && or_triggers.any? { |t| applies_to?(changes, t) })
+rescue => e
+byebug
+end
+        result
       end
 
       # Determines if a condition applies to a given pair of old-new values. If the condition
@@ -238,14 +243,18 @@ module SolidusHooks
       end
 
       def lookup_on(record, changes = nil)
-        changes ||= record.changes
+        if changes.present?
+          changes = HashWithIndifferentAccess.new(changes)
+        else
+          changes = record.changes
+        end
         if applies_to?(changes)
           trigger_on(record)
         end
       end
 
       def trigger_on(record)
-        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")        
+        logger.debug("Triggering #{self} on record #{target_model} ##{record.id}")
         self.class.trigger(self, record)
         event_dependencies.each { |dependency| dependency.trigger_on(record) }
       end
@@ -299,11 +308,8 @@ module SolidusHooks
         def cast_value(value)
           if value.is_a?(Hash)
             value
-          elsif value.is_a?(String)
-            value = value.strip.gsub(/.*{/, '{')
-            JSON.parse(value).to_hash
           else
-            JSON.parse(value).to_hash
+            YAML.load(value).to_json rescue JSON.parse(value)
           end.with_indifferent_access
         end
 
