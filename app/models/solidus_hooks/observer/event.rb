@@ -65,11 +65,7 @@ module SolidusHooks
             end
           end
         end
-begin
         result = and_result || (or_triggers && or_triggers.any? { |t| applies_to?(changes, t) })
-rescue => e
-byebug
-end
         result
       end
 
@@ -243,11 +239,7 @@ end
       end
 
       def lookup_on(record, changes = nil)
-        if changes.present?
-          changes = HashWithIndifferentAccess.new(changes)
-        else
-          changes = record.changes
-        end
+        changes ||= record.changes
         if applies_to?(changes)
           trigger_on(record)
         end
