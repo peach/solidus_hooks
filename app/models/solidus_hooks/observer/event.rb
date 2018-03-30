@@ -298,10 +298,10 @@ module SolidusHooks
 
         def cast_value(value)
           if value.is_a?(Hash)
-            value
+            value.with_indifferent_access
           else
-            YAML.load(value).to_json rescue JSON.parse(value)
-          end.with_indifferent_access
+            YAML.load(value).to_json.with_indifferent_access rescue JSON.parse(value).with_indifferent_access
+          end
         end
 
         def serialize(value)
